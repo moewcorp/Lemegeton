@@ -1089,19 +1089,7 @@ namespace Lemegeton.Core
             StatusFlags sf = StatusFlags.None;
             FFXIVClientStructs.FFXIV.Client.Game.Character.Character* Struct = (FFXIVClientStructs.FFXIV.Client.Game.Character.Character*)bc.Address;
             return (
-                (Struct->IsHostile ? StatusFlags.Hostile : StatusFlags.None)
-                |
-                (Struct->InCombat ? StatusFlags.InCombat : StatusFlags.None)
-                |
-                (Struct->IsWeaponDrawn ? StatusFlags.WeaponOut : StatusFlags.None)
-                |
-                (Struct->IsOffhandDrawn ? StatusFlags.OffhandOut : StatusFlags.None)
-                |
-                (Struct->IsPartyMember ? StatusFlags.PartyMember : StatusFlags.None)
-                |
-                (Struct->IsAllianceMember ? StatusFlags.AllianceMember : StatusFlags.None)
-                |
-                (Struct->IsFriend ? StatusFlags.Friend : StatusFlags.None)
+                (bc is BattleNpc ? StatusFlags.Hostile : StatusFlags.None)
                 |
                 (bc.CastActionId > 0 ? StatusFlags.IsCasting : StatusFlags.None)
             );
@@ -1141,8 +1129,8 @@ namespace Lemegeton.Core
                 if (go is BattleChara)
                 {
                     BattleChara bc = (BattleChara)go;
-                    incombat = (GetStatusFlags(bc) & Dalamud.Game.ClientState.Objects.Enums.StatusFlags.InCombat) != 0;
-                    if (hostileTargettable == false && isavatar == false && (GetStatusFlags(bc) & Dalamud.Game.ClientState.Objects.Enums.StatusFlags.Hostile) != 0)
+                    incombat = (bc.StatusFlags & Dalamud.Game.ClientState.Objects.Enums.StatusFlags.InCombat) != 0;
+                    if (hostileTargettable == false && isavatar == false && (bc.StatusFlags & Dalamud.Game.ClientState.Objects.Enums.StatusFlags.Hostile) != 0)
                     {
                         unsafe
                         {

@@ -255,7 +255,7 @@ namespace Lemegeton.Content
                 if (go is BattleChara)
                 {
                     BattleChara bc = (BattleChara)go;
-                    if ((_state.GetStatusFlags(bc) & Dalamud.Game.ClientState.Objects.Enums.StatusFlags.Hostile) != 0)
+                    if ((bc.StatusFlags & Dalamud.Game.ClientState.Objects.Enums.StatusFlags.Hostile) != 0)
                     {
                         Lumina.Excel.GeneratedSheets.Action a = _state.dm.Excel.GetSheet<Lumina.Excel.GeneratedSheets.Action>().GetRow(actionId);
                         if (IgnoreAutoAttacks == true && a.ActionCategory.Row == 1)
@@ -357,7 +357,7 @@ namespace Lemegeton.Content
                     }
                     _lastSpawnNameId = bc.NameId;
                     _lastSpawnTs = DateTime.Now;
-                    if ((_state.GetStatusFlags(bc) & Dalamud.Game.ClientState.Objects.Enums.StatusFlags.Hostile) != 0 && bc.MaxHp > 0)
+                    if ((bc.StatusFlags & Dalamud.Game.ClientState.Objects.Enums.StatusFlags.Hostile) != 0 && bc.MaxHp > 0)
                     {
                         Entry e = new Entry();
                         e.StartTime = (float)Math.Round((DateTime.Now - _startTime).TotalSeconds, 1);

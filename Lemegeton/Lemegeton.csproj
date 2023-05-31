@@ -7,7 +7,7 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <DalamudLibPath>$(appdata)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
+    <DalamudLibPath>..\..\DalamudDep\</DalamudLibPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   
