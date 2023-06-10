@@ -44,12 +44,6 @@ using System.Xml.Linq;
 
 namespace Lemegeton
 {
-    /*
-     * 1.0.1.4
-     * - added a multi-target DoT tracker
-     * - fixed an issue where the global timeline overlay toggle in settings was not respected
-     * - fixed an issue where the global notification overlay toggle in settings was not respected
-     */
 
     public sealed class Plugin : IDalamudPlugin
     {
@@ -59,7 +53,7 @@ namespace Lemegeton
 #else
         public string Name => "Lemegeton";
 #endif
-        public string Version = "1.0.1.4";
+        public string Version = "1.0.1.7";
 
         internal class Downloadable
         {
@@ -319,9 +313,16 @@ namespace Lemegeton
         {
             foreach (Type type in Assembly.GetAssembly(typeof(Core.Action)).GetTypes().Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(Core.Action))))
             {
-                ActionTypeItem ati = new ActionTypeItem();
-                ati.Instance = (Core.Action)Activator.CreateInstance(type);
-                ActionTypes.Add(ati);
+                try
+                {
+                    ActionTypeItem ati = new ActionTypeItem();
+                    ati.Instance = (Core.Action)Activator.CreateInstance(type);
+                    ActionTypes.Add(ati);
+                }
+                catch (Exception ex)
+                {
+                    Log(LogLevelEnum.Error, "Couldn't initialize Action type {0} due to exception: {1} at {2}", type.Name, ex.Message, ex.StackTrace);
+                }
             }
             ActionTypes.Sort((a, b) => a.Instance.Describe().CompareTo(b.Instance.Describe()));
         }
@@ -998,16 +999,23 @@ namespace Lemegeton
         {
             foreach (Type type in Assembly.GetAssembly(typeof(Core.ContentCategory)).GetTypes().Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(Core.ContentCategory))))
             {
-                //Log(LogLevelEnum.Debug, "Creating ContentCategory {0}", type.Name.ToString());
-                Core.ContentCategory c = (Core.ContentCategory)Activator.CreateInstance(type, new object[] { _state });
-                switch (c.ContentCategoryType)
+                try
                 {
-                    case Core.ContentCategory.ContentCategoryTypeEnum.Content:
-                        _content.Add(c);
-                        break;
-                    case Core.ContentCategory.ContentCategoryTypeEnum.Other:
-                        _other.Add(c);
-                        break;
+                    //Log(LogLevelEnum.Debug, "Creating ContentCategory {0}", type.Name.ToString());
+                    Core.ContentCategory c = (Core.ContentCategory)Activator.CreateInstance(type, new object[] { _state });
+                    switch (c.ContentCategoryType)
+                    {
+                        case Core.ContentCategory.ContentCategoryTypeEnum.Content:
+                            _content.Add(c);
+                            break;
+                        case Core.ContentCategory.ContentCategoryTypeEnum.Other:
+                            _other.Add(c);
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log(LogLevelEnum.Error, "Couldn't initialize ContentCategory type {0} due to exception: {1} at {2}", type.Name, ex.Message, ex.StackTrace);
                 }
             }
             foreach (Core.ContentCategory cc in _content)
@@ -1029,9 +1037,17 @@ namespace Lemegeton
         {
             foreach (Type type in Assembly.GetAssembly(typeof(Core.Language)).GetTypes().Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(Core.Language))))
             {
-                //Log(LogLevelEnum.Debug, "Creating Language {0}", type.Name.ToString());
-                Core.Language c = (Core.Language)Activator.CreateInstance(type, new object[] { _state });
-                I18n.AddLanguage(c);
+
+                try
+                {
+                    //Log(LogLevelEnum.Debug, "Creating Language {0}", type.Name.ToString());
+                    Core.Language c = (Core.Language)Activator.CreateInstance(type, new object[] { _state });
+                    I18n.AddLanguage(c);
+                }
+                catch (Exception ex)
+                {
+                    Log(LogLevelEnum.Error, "Couldn't initialize Language type {0} due to exception: {1} at {2}", type.Name, ex.Message, ex.StackTrace);
+                }
             }
             Core.Language def = I18n.DefaultLanguage;
             foreach (var kp in I18n.RegisteredLanguages)
